@@ -1,30 +1,31 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
+	"fmt"
+	"log/slog"
 	"os"
 
+	"github.com/iamsamd/cdm_framework"
 	"github.com/spf13/cobra"
 )
 
-
+var debug bool
+var log *slog.Logger
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cdm-cli",
-	Short: "A brief description of your application",
+	Short: "cli tool for running cdm checks and generating check templates",
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	PersistentPreRun: setDebugLogging,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -42,10 +43,19 @@ func init() {
 	// will be global for your application.
 
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cdm-cli.yaml)")
+	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug logging")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-
+func setDebugLogging(cmd *cobra.Command, args []string) {
+	// Set logger initisalised to DEBUG if debug flag is passed
+	if debug {
+		fmt.Println("Debug mode")
+		log = cdm_framework.InitLogger("DEBUG")
+	} else {
+		log = cdm_framework.Logger
+	}
+}
