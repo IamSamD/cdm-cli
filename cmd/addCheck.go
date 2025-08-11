@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/go-git/go-git/v6"
@@ -19,10 +20,11 @@ var (
 
 // addCheckCmd represents the addCheck command
 var addCheckCmd = &cobra.Command{
-	Use:   "addCheck",
-	Short: "Generate a template for a new check",
-	Long:  ``,
-	Run:   addCheck,
+	Use:     "addCheck",
+	Short:   "Generate a template for a new check",
+	Long:    ``,
+	PreRunE: validateFlagsFormat,
+	Run:     addCheck,
 }
 
 func init() {
@@ -41,6 +43,21 @@ func init() {
 	addCheckCmd.Flags().StringVarP(&resource, "resource", "r", "", "second level directory for the check, usually the cloud resource the check relates to (aks | eks | cloud_compser | source_control) etc")
 	addCheckCmd.Flags().StringVarP(&checkName, "check-name", "n", "", "third level directory for the check and the name of the check (upgrade | certificate_expiry | backup_check) etc")
 
+}
+
+func validateFlagsFormat(cmd *cobra.Command, args []string) error {
+	// Validate check name does not contain spaces or dashes
+	if strings.Contains(checkName, " ") || strings.Contains(checkName, "-") {
+		log.Error("check name must not contain spaces or hyphens")
+		return fmt.Errorf("invalid check name format")
+	}
+
+	// Convert all flags to lower case
+	provider = strings.ToLower(provider)
+	resource = strings.ToLower(resource)
+	checkName = strings.ToLower(checkName)
+
+	return nil
 }
 
 func addCheck(cmd *cobra.Command, args []string) {
@@ -70,6 +87,13 @@ func addCheck(cmd *cobra.Command, args []string) {
 		Depth:    1,
 	})
 	if err != nil {
+		log.Error(err.Error())
+		return
+	}
+
+	// Delete the .git directory from the check template
+	gitDir := filepath.Join(checkPath, ".git")
+	if err := os.RemoveAll(gitDir); err != nil {
 		log.Error(err.Error())
 		return
 	}
