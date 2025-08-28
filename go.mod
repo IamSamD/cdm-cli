@@ -6,6 +6,7 @@ toolchain go1.24.2
 
 require (
 	github.com/go-git/go-git/v6 v6.0.0-20250728093604-6aaf1933ecab
+	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.9.1
 )
 
@@ -19,7 +20,6 @@ require (
 	github.com/go-git/gcfg/v2 v2.0.2 // indirect
 	github.com/go-git/go-billy/v6 v6.0.0-20250627091229-31e2a16eef30 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/pjbgf/sha1cd v0.4.0 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
@@ -30,9 +30,9 @@ require (
 )
 
 require (
-	github.com/iamsamd/cdm_framework v0.0.1
+	github.com/iamsamd/cdm_framework v0.0.3
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 )
 
-replace github.com/iamsamd/cdm_framework => ../cdm_framework // for local development - to be removed on release v1 of cdm_framework
+// replace github.com/iamsamd/cdm_framework => ../cdm_framework // for local development - to be removed on release v1 of cdm_framework

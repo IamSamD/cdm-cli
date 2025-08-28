@@ -32,6 +32,8 @@ github.com/go-git/go-git/v6 v6.0.0-20250728093604-6aaf1933ecab h1:PSNQb+b1rfHR5t
 github.com/go-git/go-git/v6 v6.0.0-20250728093604-6aaf1933ecab/go.mod h1:gI6xSrrkXH4EKP38iovrsY2EYf2XDU3DrIZRshlNDm0=
 github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 h1:f+oWsMOmNPc8JmEHVZIycC7hBoQxHH9pNKQORJNozsQ=
 github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8/go.mod h1:wcDNUvekVysuuOpQKo3191zZyTpiI6se1N1ULghS0sw=
+github.com/iamsamd/cdm_framework v0.0.3 h1:59IZMeZb26oRq21tS9mP5InXFqWU1GF2lSstVnN5GnU=
+github.com/iamsamd/cdm_framework v0.0.3/go.mod h1:+Ah/VUGQOZylnVPsZtjt9JT1pNpMSOLs5JbxNiCx5kc=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
