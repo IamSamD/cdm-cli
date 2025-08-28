@@ -12,9 +12,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/iamsamd/cdm_framework"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
+
+var log *cdm_framework.Logger = cdm_framework.NewLogger()
 
 // runCheckCmd represents the runCheck command
 var runCheckCmd = &cobra.Command{
@@ -81,53 +84,8 @@ func runCheck(cmd *cobra.Command, args []string) {
 
 }
 
-func runCheckBinary(config map[string]string) error {
-	cmd := exec.Command(fmt.Sprintf("./%s", config["BINARY_NAME"]))
-
-	// Run the command and capture the output
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("failed to run check: %s : %v", output, err)
-	}
-
-	// Print the output
-	fmt.Println(string(output))
-	return nil
-}
-
-func downloadCheck(config map[string]string) error {
-	// Replace check name for binary name
-
-	url := fmt.Sprintf("https://github.com/IamSamD/cdm-checks/releases/download/%s_%s/%s", config["BINARY_NAME"], config["CHECK_VERSION"], config["BINARY_NAME"])
-
-	// Download the check binary
-	resp, err := http.Get(url)
-	if err != nil {
-		return fmt.Errorf("failed to download check binary: %v", err)
-	}
-	defer resp.Body.Close()
-
-	binary, err := os.Create(config["BINARY_NAME"])
-	if err != nil {
-		return fmt.Errorf("failed to create binary file: %v", err)
-	}
-
-	_, err = io.Copy(binary, resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to copy response body to binary file: %v", err)
-	}
-
-	binary.Close()
-
-	err = os.Chmod(config["BINARY_NAME"], 0755)
-	if err != nil {
-		return fmt.Errorf("failed to set permissions on binary file: %v", err)
-	}
-
-	return nil
-}
-
 func parseOrchestratorLevelEnvVars() (map[string]string, error) {
+	log.Debug("parsing orchestrator level env vars...")
 	if os.Getenv("CHECK_NAME") == "" || os.Getenv("CHECK_VERSION") == "" {
 		return nil, fmt.Errorf("CHECK_NAME and CHECK_VERSION must be set")
 	}
@@ -158,4 +116,60 @@ func isSkipCheck() (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+func downloadCheck(config map[string]string) error {
+	// Replace check name for binary name
+	fmt.Println("Downloading check...")
+	url := fmt.Sprintf("https://github.com/IamSamD/cdm-checks/releases/download/%s_%s/%s", config["BINARY_NAME"], config["CHECK_VERSION"], config["BINARY_NAME"])
+
+	// Download the check binary
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("failed to download check binary: %v", err)
+	}
+	defer resp.Body.Close()
+
+	binary, err := os.Create(config["BINARY_NAME"])
+	if err != nil {
+		return fmt.Errorf("failed to create binary file: %v", err)
+	}
+
+	_, err = io.Copy(binary, resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to copy response body to binary file: %v", err)
+	}
+
+	binary.Close()
+
+	err = os.Chmod(config["BINARY_NAME"], 0755)
+	if err != nil {
+		return fmt.Errorf("failed to set permissions on binary file: %v", err)
+	}
+
+	fmt.Print("Check downloaded successfully\n\n")
+	return nil
+}
+
+func runCheckBinary(config map[string]string) error {
+	cmd := exec.Command(fmt.Sprintf("./%s", config["BINARY_NAME"]))
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Run the command and capture the output
+	err := cmd.Run()
+	if err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			code := exitErr.ExitCode()
+			switch code {
+			case 2:
+				return fmt.Errorf("check failed")
+			default:
+				return fmt.Errorf("failed to run check: %v", err)
+			}
+		}
+	}
+
+	return nil
 }
